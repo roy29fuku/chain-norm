@@ -5,7 +5,7 @@ with open('README.md', 'r') as fh:
 
 setuptools.setup(
     name='chain-norm',
-    version='0.0.1',
+    version='0.0.2',
     author='Ryota Yamada',
     author_email='roy29fuku@gmail.com',
     description='chain-norm is python library for suquential text normalization',
