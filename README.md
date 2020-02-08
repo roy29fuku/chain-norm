@@ -1,0 +1,1 @@
+chain-norm is python library for suquential text normalization
