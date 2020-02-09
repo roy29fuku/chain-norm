@@ -1,3 +1,4 @@
 chain_norm.egg-info
 dist
 ws.py
+*.sh
