@@ -10,6 +10,7 @@ twine = "*"
 setuptools = "*"
 wheel = "*"
 jaconv = "*"
+word2number = "*"
 
 [requires]
 python_version = "3.8"
