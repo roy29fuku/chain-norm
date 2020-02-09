@@ -9,6 +9,7 @@ verify_ssl = true
 twine = "*"
 setuptools = "*"
 wheel = "*"
+jaconv = "*"
 
 [requires]
 python_version = "3.8"
