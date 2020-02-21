@@ -38,7 +38,7 @@ class RomNum2AraNumTest(unittest.TestCase):
 
     def test_1(self):
         text = 'Glycogen storage disease type Ⅳ'
-        answer = 'Glycogen storage disease type four'
+        answer = 'Glycogen storage disease type FOUR'
         self.assertEqual(answer, self.rule.apply(text))
 
 

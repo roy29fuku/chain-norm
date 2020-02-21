@@ -1,75 +1,9 @@
 from abc import ABCMeta, abstractmethod
 from enum import Enum
-from itertools import chain
 import unicodedata
 
 import jaconv
 from word2number.w2n import word_to_num
-
-
-def is_greek_letter(char: str):
-    """determine if the char is Greek character
-    see also: https://unicode.org/charts/PDF/U0370.pdf
-    :param char:
-    :return:
-    """
-    codes = chain(range(0x370, 0x3e2), range(0x3f0, 0x400))
-    symbols = [chr(c) for c in codes]
-    letters = [c for c in symbols if c.isalpha()]
-    if char in letters:
-        return True
-    else:
-        return False
-
-
-def get_name_of_greek_letter(char: str):
-    """
-    caution: return None for "ʹ" (GREEK NUMERAL SIGN) and "ͺ" (GREEK YPOGEGRAMMENI)
-    :param char:
-    :return:
-    """
-    name = unicodedata.name(char)
-    if 'ARCHAIC' in name:
-        return name.split()[-1]
-    elif 'PAMPHYLIAN' in name:
-        return name.split()[-1]
-    elif 'WITH TONOS' in name:
-        return name.split()[-3]
-    elif 'SYMBOL' in name:
-        return name.split()[-2]
-    elif 'SMALL LETTER' in name:
-        return name.split()[3]
-    elif 'CAPITAL LETTER' in name:
-        return name.split()[3]
-    elif 'LETTER' in name:
-        return name.split()[2]
-    else:
-        return
-
-
-def is_roman_numeral(char: str):
-    """determine if the char is Roman Numeral
-    see also: https://unicode.org/charts/PDF/U2150.pdf
-    :param char:
-    :return:
-    """
-    codes = range(0x2160, 0x217f)
-    symbols = [chr(c) for c in codes]
-    if char in symbols:
-        return True
-    else:
-        return False
-
-
-def get_name_of_roman_numeral(char: str):
-    """
-    caution: return expression of number
-    :param char:
-    :return:
-    """
-    name = unicodedata.name(char)
-    name = name.split('ROMAN NUMERAL ')[-1]
-    return name
 
 
 class Case(Enum):
@@ -111,37 +45,86 @@ class Greek2Alpha(Rule):
     g2a = Greek2Alpha()
     g2a.apply("β ver")  # return "beta ver"
     g2a.apply("50 μg")  # return "50 mug"
+    see also: https://unicode.org/charts/PDF/U0370.pdf
     """
     def __init__(self):
         super(Greek2Alpha, self).__init__()
 
-    def apply(self, text: str, case: Case=Case.LOWER):
-        char_list = []
-        for char in text:
-            if is_greek_letter(char):
-                char = get_name_of_greek_letter(char)
-                if case == Case.LOWER:
-                    char = char.lower()
-            char_list.append(char)
-        return ''.join(char_list)
+    def apply(self, text: str):
+        # Letters (0x0386, 0x0388-0x03CE)
+        ## GREEK CAPITAL LETTER
+        text = text.replace('Α', 'ALPHA').replace('Β', 'BETA').replace('Γ', 'GAMMA').replace('Δ', 'DELTA')
+        text = text.replace('Ε', 'EPSILON').replace('Ζ', 'ZETA').replace('Η', 'ETA').replace('Θ', 'THETA')
+        text = text.replace('Ι', 'IOTA').replace('Κ', 'KAPPA').replace('Λ', 'LAMDA').replace('Μ', 'MU')
+        text = text.replace('Ν', 'NU').replace('Ξ', 'XI').replace('Ο', 'OMICRON').replace('Π', 'PI')
+        text = text.replace('Ρ', 'RHO').replace('Σ', 'SIGMA').replace('Τ', 'TAU').replace('Υ', 'UPSILON')
+        text = text.replace('Φ', 'PHI').replace('Χ', 'CHI').replace('Ψ', 'PSI').replace('Ω', 'OMEGA')
+        ## GREEK CAPITAL LETTER WITH DIALYTIKA
+        text = text.replace('Ϊ', 'IOTA').replace('Ϋ', 'UPSILON')
+        ## GREEK CAPITAL LETTER WITH TONOS
+        text = text.replace('Ά', 'ALPHA').replace('Έ', 'EPSILON').replace('Ή', 'ETA').replace('Ί', 'IOTA')
+        text = text.replace('Ό', 'OMICRON').replace('Ύ', 'UPSILON').replace('Ώ', 'OMEGA').replace('ΐ', 'IOTA')
+        ## GREEK SMALL LETTER
+        text = text.replace('α', 'alpha').replace('β', 'beta').replace('γ', 'gamma').replace('δ', 'delta')
+        text = text.replace('ε', 'epsilon').replace('ζ', 'zeta').replace('η', 'eta').replace('θ', 'theta')
+        text = text.replace('ι', 'iota').replace('κ', 'kappa').replace('λ', 'lamda').replace('μ', 'mu')
+        text = text.replace('ν', 'nu').replace('ξ', 'xi').replace('ο', 'omicron').replace('π', 'pi')
+        text = text.replace('ρ', 'rho').replace('ς', 'sigma').replace('σ', 'sigma').replace('τ', 'tau').replace('υ', 'upsilon')
+        text = text.replace('φ', 'phi').replace('χ', 'chi').replace('ψ', 'psi').replace('ω', 'omega')
+        ## GREEK SMALL LETTER WITH DIALYTIKA
+        text = text.replace('ά', 'alpha').replace('έ', 'epsilon').replace('ή', 'eta').replace('ί', 'iota')
+        text = text.replace('ϊ', 'iota').replace('ϋ', 'upsilon')
+        ## GREEK SMALL LETTER WITH TONOS
+        text = text.replace('ό', 'omicron').replace('ύ', 'upsilon').replace('ώ', 'omega')
+        ## GREEK SMALL LETTER WITH DIALYTIKA AND TONOS
+        text = text.replace('ΰ', 'upsilon')
+
+        # Additional letters (0x037F, 0x03F3)
+        text = text.replace('Ϳ', 'YOT').replace('ϳ', 'yot')
+
+        # Variant letterforms (0x03CF-0x03D7, 0x03F0-0x03F2, 0x03F4-0x03F6, 0x03F9)
+        text = text.replace('Ϗ', 'kai').replace('ϐ', 'beta').replace('ϑ', 'theta').replace('ϒ', 'upsilon')
+        text = text.replace('ϓ', 'upsilon').replace('ϔ', 'upsilon').replace('ϕ', 'phi').replace('ϖ', 'pi')
+        text = text.replace('ϗ', 'kai')
+        text = text.replace('ϰ', 'kappa').replace('ϱ', 'rho').replace('ϲ', 'sigma')
+        text = text.replace('ϴ', 'THETA').replace('ϵ', 'epsilon').replace('϶', 'epsilon')
+        text = text.replace('Ϲ', 'SIGMA')
+
+        # Archaic letters (0x0370-0x0373, 0x0376-0x0377, 0x03D8-0x03E1, 0x03FA-0x03FB)
+        text = text.replace('Ͱ', 'HETA').replace('ͱ', 'heta').replace('Ͳ', 'SAMPI').replace('ͳ', 'sampi')
+        text = text.replace('Ͷ', 'PAMPHYLIAN').replace('ͷ', 'pamphylian')
+        text = text.replace('Ϙ', 'KOPPA').replace('ϙ', 'koppa').replace('Ϛ', 'SIGMA').replace('ϛ', 'sigma')
+        text = text.replace('Ϝ', 'DIGAMMA').replace('ϝ', 'digamma').replace('Ϟ', 'KOPPA').replace('ϟ', 'koppa')
+        text = text.replace('Ϡ', 'SAMPI').replace('ϡ', 'sampi')
+        text = text.replace('Ϻ', 'SAN').replace('ϻ', 'san')
+
+        # Additional archaic letters for Bactrian (0x03F7-0x03F8)
+        text = text.replace('Ϸ', 'SHO').replace('ϸ', 'sho')
+
+        # Symbol (0x03FC-0x03FF)
+        text = text.replace('ϼ', 'rho').replace('Ͻ', 'SIGMA').replace('Ͼ', 'SIGMA').replace('Ͽ', 'SIGMA')
+
+        return text
 
 
 class RomNum2AraNum(Rule):
     """convert Roman Numeral to Arabic Numeral
+    see also: https://unicode.org/charts/PDF/U2150.pdf
     """
     def __init__(self):
         super(RomNum2AraNum, self).__init__()
 
     def apply(self, text: str, case: Case=Case.LOWER):
-        char_list = []
-        for char in text:
-            if is_roman_numeral(char):
-                char = get_name_of_roman_numeral(char)
-                if case == Case.LOWER:
-                    char = char.lower()
-            char_list.append(char)
-        return ''.join(char_list)
-
+        # Roman numerals (0x2160-0x217f)
+        text = text.replace('Ⅰ', 'ONE').replace('Ⅱ', 'TWO').replace('Ⅲ', 'THREE').replace('Ⅳ', 'FOUR')
+        text = text.replace('Ⅴ', 'FIVE').replace('Ⅵ', 'SIX').replace('Ⅶ', 'SEVEN').replace('Ⅷ', 'EIGHT')
+        text = text.replace('Ⅸ', 'NINE').replace('Ⅹ', 'TEN').replace('Ⅺ', 'ELEVEN').replace('Ⅻ', 'TWELVE')
+        text = text.replace('Ⅼ', 'FIFTY').replace('Ⅽ', 'ONE HUNDRED').replace('Ⅾ', 'FIVE HUNDRED').replace('Ⅿ', 'ONE THOUSAND')
+        text = text.replace('ⅰ', 'one').replace('ⅱ', 'two').replace('ⅲ', 'three').replace('ⅳ', 'four')
+        text = text.replace('ⅴ', 'five').replace('ⅵ', 'six').replace('ⅶ', 'seven').replace('ⅷ', 'eight')
+        text = text.replace('ⅸ', 'nine').replace('ⅹ', 'ten').replace('ⅺ', 'eleven').replace('ⅻ', 'twelve')
+        text = text.replace('ⅼ', 'fifty').replace('ⅽ', 'one hundred').replace('ⅾ', 'five hundred').replace('ⅾ', 'one thousand')
+        return text
 
 class Word2Num(Rule):
     """convert numeric word to number

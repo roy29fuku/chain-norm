@@ -8,7 +8,7 @@ with open("requirements.txt") as f:
 
 setuptools.setup(
     name='chain-norm',
-    version='0.0.8',
+    version='0.0.9',
     author='Ryota Yamada',
     author_email='roy29fuku@gmail.com',
     description='chain-norm is python library for suquential text normalization',
