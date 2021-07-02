@@ -2,3 +2,6 @@ chain_norm.egg-info
 dist
 ws.py
 *.sh
+.idea/*
+.DS_Store
+.pyc
