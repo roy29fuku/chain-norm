@@ -6,6 +6,7 @@ verify_ssl = true
 [dev-packages]
 jupyter = "*"
 pipdeptree = "*"
+pip-chill = "*"
 
 [packages]
 twine = "*"

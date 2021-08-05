@@ -4,4 +4,5 @@ ws.py
 *.sh
 .idea/*
 .DS_Store
-.pyc
+*.pyc
+build/*
